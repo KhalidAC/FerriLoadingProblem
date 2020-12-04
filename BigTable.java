@@ -16,15 +16,15 @@ public class BigTable{
 
     static int bestK; // integer to show the best number of cars that can fit on the boat
 
-    static int[] visArr; // array to store visited values.
-
     static int L;  // boat lenght in cm to match unit of car length.
 
     static int currS; // space left on left side of the boat
 
     static int newS; // stores updated value of s
 
-    static boolean[][] visited; // stores the visited values
+    static boolean[] visited; // stores the visited values
+
+    static int spaceL, spaceR; // values to store space available on the ferri for the left or Right side respectively
 
     public static void main(String[] args) {
         // will have to code for scanner to execute the functions
@@ -37,7 +37,10 @@ public class BigTable{
 
         System.out.println(Arrays.toString(cars));
 
-        // backTrackSolve(0, L);
+        backTrackSolve(0, L);
+        System.out.println(bestK);
+        System.out.println(Arrays.toString(currX));
+        
 
     }
 
@@ -85,7 +88,11 @@ public class BigTable{
             currX = new int[cars.length];
             bestX = new int[cars.length];
 
-            visited = new boolean[M+1][L+1];
+            visited = new boolean[(M+1)*(L+1)]; //initialize the visited array
+
+            spaceL = boatLength * 100;
+
+            spaceR = boatLength * 100;
 
         }
         catch ( FileNotFoundException e ) {
@@ -97,6 +104,10 @@ public class BigTable{
 
 
     }
+    /*
+    * Backtracking method takes two integers as arguments to compute the ferri loading problem and to populate
+    * the port and Starboard of the ferri.
+    */
 
     public static void backTrackSolve(int currK, int currS){
         if (currK>bestK){
@@ -105,42 +116,37 @@ public class BigTable{
             bestX[i] = currX[i];
             }
         }
-        // if(currK<M){
-        //     if(add to left && visited(currK, currS-cars[currK])==false){
-        //         currX[currK]=1;
-        //         newS = currS - cars[currK];
-        //         backTrackSolve(currK+1, newS);
-        //         visited[currK+1][currS]= true;
-        //     }
-        //     if(space on right && visited(currK, currS-cars[currK])==false){
-        //         currX[currK]=1;
-        //         newS = currS - cars[currK];
-        //         backTrackSolve(currK+1, newS);
-        //         visited[currK+1][currS]= true;
-        //     }
-        // }
+        if(currK<M){
+            if(spaceL>currS && visited(currK, currS-cars[currK])){
+                currX[currK]=1;
+                newS = currS - cars[currK];
+                backTrackSolve(currK+1, newS);
+                visited[(currK+1)*currS]= true;
+                spaceL = spaceL - cars[currK];
+            }
+            if(spaceR > currS && visited(currK, currS-cars[currK])){
+                currX[currK]=0;
+                newS = currS - cars[currK];
+                backTrackSolve(currK+1, newS);
+                visited[(currK+1)*currS]= true;
+                spaceR = spaceR - cars[currK];
+            }
+
+        }
 
 
     }
 
-
-
+    /*
+    * visites is a boolean function which returns true if the index of the 2 dimensional array was visited
+    * false otherwise
+    */
     public static boolean visited(Integer k, Integer s){
         //the index of array needs to be changed into the array for x to for the spots 0 and 1.
-        if (visited[k][s]= true){
+        if (visited[k*s]= true){
             return true;
         }
         return false;
     }
-
-    // public static boolean backtracking(Integer i){
-    //     for (i=0; i<n; i++){
-    //         if (index[i] != -1){
-    //             return false; //means that cell was visited
-    //         }
-    //         return true;
-    //     }
-    // }
-    
 
 }
