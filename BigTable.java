@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class BigTable{
-    static int M = 0; // number of cars 
+    static int n = 0; // number of cars 
 
     static int iter; // number of iterations in the code
 
@@ -14,7 +14,7 @@ public class BigTable{
 
     static int[] currX; // array to show the current solution
 
-    static int bestK; // integer to show the best number of cars that can fit on the boat
+    static int bestK = -1; // integer to show the best number of cars that can fit on the boat
 
     static int L;  // boat lenght in cm to match unit of car length.
 
@@ -24,22 +24,31 @@ public class BigTable{
 
     static boolean[] visited; // stores the visited values
 
-    static int spaceL, spaceR; // values to store space available on the ferri for the left or Right side respectively
 
     public static void main(String[] args) {
         // will have to code for scanner to execute the functions
         initialize(args[0]);
         
+        // used the commented lines to test the program
+        // System.out.println(n);
+        // System.out.println(iter);
+        // System.out.println("Length of boat in cm " + L);
 
-        System.out.println(M);
-        System.out.println(iter);
-        System.out.println("Length of boat in cm " + L);
-
-        System.out.println(Arrays.toString(cars));
+        //System.out.println(Arrays.toString(cars));
 
         backTrackSolve(0, L);
         System.out.println(bestK);
-        System.out.println(Arrays.toString(currX));
+
+        // System.out.println(Arrays.toString(currX));
+
+        for (int i=0; i<bestK;i++){
+            if (currX[i]== 1){
+                System.out.println("port");
+            }
+            else{
+                System.out.println("starboard");
+            }
+        }
         
 
     }
@@ -75,12 +84,11 @@ public class BigTable{
 
             iter = allVal[0];
 
-            System.out.println(Arrays.toString(allVal));
-            // M = allVal.length - 2; CANT HARDCODE
+            // System.out.println(Arrays.toString(allVal));
 
             cars = Arrays.copyOfRange(allVal, 3, allVal.length-1);
 
-            M = cars.length;
+            n = cars.length;
             
             boatLength = allVal[2];
             L = boatLength * 100;
@@ -88,11 +96,7 @@ public class BigTable{
             currX = new int[cars.length];
             bestX = new int[cars.length];
 
-            visited = new boolean[(M+1)*(L+1)]; //initialize the visited array
-
-            spaceL = boatLength * 100;
-
-            spaceR = boatLength * 100;
+            visited = new boolean[(n+1)*(L+1)]; //initialize the visited array
 
         }
         catch ( FileNotFoundException e ) {
@@ -110,26 +114,30 @@ public class BigTable{
     */
 
     public static void backTrackSolve(int currK, int currS){
+        int total =0;
+        for(int i=0; i< currK;i++){
+            total+=cars[i];
+        }
         if (currK>bestK){
             bestK = currK;
-            for(int i=0; i<cars.length;i++){
+            for(int i=0; i<bestK;i++){
             bestX[i] = currX[i];
             }
         }
-        if(currK<M){
-            if(spaceL>currS && visited(currK, currS-cars[currK])){
+        if(currK<n){
+            if(currS>=cars[currK] && !visited[(currK+1)*(currS-cars[currK])]){
                 currX[currK]=1;
+                // currS = currS - cars[currK];
                 newS = currS - cars[currK];
                 backTrackSolve(currK+1, newS);
-                visited[(currK+1)*currS]= true;
-                spaceL = spaceL - cars[currK];
+                visited[(currK+1)*newS]= true;
             }
-            if(spaceR > currS && visited(currK, currS-cars[currK])){
+            if((2*L - currS - total)>= cars[currK] && !visited[(currK+1)*(currS)]){
                 currX[currK]=0;
-                newS = currS - cars[currK];
-                backTrackSolve(currK+1, newS);
+                // currS = currS - cars[currK];
+                // spaceR = spaceR - cars[currK];
+                backTrackSolve(currK+1, currS);
                 visited[(currK+1)*currS]= true;
-                spaceR = spaceR - cars[currK];
             }
 
         }
