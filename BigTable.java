@@ -4,6 +4,10 @@ import java.util.*;
 public class BigTable{
     static int n = 0; // number of cars 
 
+    static int allVal[];
+
+    static ArrayList<Integer> cars2 = new ArrayList<Integer>();
+
     static int iter; // number of iterations in the code
 
     static int[] cars; // array for the cars in the file and stores their length in cm
@@ -25,30 +29,62 @@ public class BigTable{
     static boolean[] visited; // stores the visited values
 
 
-    public static void main(String[] args) {
-        // will have to code for scanner to execute the functions
-        initialize(args[0]);
+    public static void main(String[] args) throws IOException{
+        // initialize("input1.txt");
         
-        // used the commented lines to test the program
-        // System.out.println(n);
-        // System.out.println(iter);
-        // System.out.println("Length of boat in cm " + L);
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        iter= Integer.parseInt(br.readLine());
 
-        //System.out.println(Arrays.toString(cars));
+        for (int id=0; id<iter; id++){
+            br.readLine(); //empty line
+            cars2.clear();
+            boatLength= Integer.parseInt(br.readLine());
+            L= boatLength*100;
 
-        backTrackSolve(0, L);
-        System.out.println(bestK);
-
-        // System.out.println(Arrays.toString(currX));
-
-        for (int i=0; i<bestK;i++){
-            if (currX[i]== 1){
-                System.out.println("port");
+            String val;
+            // int j=0;
+            boolean whl = true;
+            val=br.readLine();
+            while(whl){
+                if(val.equals("0")){
+                    whl = false;
+                }
+                cars2.add(Integer.parseInt(val));
+                val=br.readLine();
             }
-            else{
-                System.out.println("starboard");
+            // br.close();
+
+            n=cars2.size();
+            cars= new int[n];
+
+            for(int i=0;i<cars2.size();i++){
+                if(cars2.get(i)==0){
+                    break;
+                }
+                cars[i]=cars2.get(i);
             }
+            
+            
+
+            visited=new boolean[(n+1)*(L+1)];
+
+            currX = new int[cars.length];
+            bestX = new int[cars.length];
+
+            backTrackSolve(0, L);
+            toString(bestX);
+
         }
+        
+       
+
+        
+
+        //tried soolving multiple interations
+        // for (int i=0;i<iter;i++){
+        //     init2(cars);
+        // }
+
         
 
     }
@@ -58,7 +94,6 @@ public class BigTable{
     *   values
     */ 
     public static void initialize(String fileName) {
-        int allVal[];
         int counter = 0;
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 
@@ -80,23 +115,39 @@ public class BigTable{
                     allVal[i] = Integer.parseInt(line);
                 }
             }
-            br2.close();
+            
 
             iter = allVal[0];
 
-            // System.out.println(Arrays.toString(allVal));
+            System.out.println(Arrays.toString(allVal));
+            // cars = Arrays.copyOfRange(allVal, (allVal[i]=-1)+1, allVal[i]=0);
+            cars = Arrays.copyOfRange(allVal, 3, allVal.length-1); // i realize this is wrong as it is hardcoded and does not help for multiple iterations
 
-            cars = Arrays.copyOfRange(allVal, 3, allVal.length-1);
+            //trying to solve for multiple iterations via different approach than using method init2()
+            // for(int i=0; i<allVal.length;i++){
+            //     if (allVal[i]==-1){
+            //         i++;
+            //         boatLength=allVal[i];
+            //     }
+            //     for(int j=0;j<allVal.length - i; j++){
+            //         cars[j]= allVal[i];
+            //         if(allVal[i]==0){
+            //             break;
+            //         }
+            //     }
 
+            // }
             n = cars.length;
-            
-            boatLength = allVal[2];
+            System.out.println(Arrays.toString(cars));
+
+            boatLength = allVal[2]; // also realized this is wrong as it is hardcoded
             L = boatLength * 100;
+            visited = new boolean[(n+1)*(L+1)]; //initialize the visited array
+            
 
             currX = new int[cars.length];
             bestX = new int[cars.length];
 
-            visited = new boolean[(n+1)*(L+1)]; //initialize the visited array
 
         }
         catch ( FileNotFoundException e ) {
@@ -141,6 +192,11 @@ public class BigTable{
             }
 
         }
+        // currK=0;
+        // currS=0;
+        // total=0;
+        // bestK=0;
+
 
 
     }
@@ -149,12 +205,39 @@ public class BigTable{
     * visites is a boolean function which returns true if the index of the 2 dimensional array was visited
     * false otherwise
     */
-    public static boolean visited(Integer k, Integer s){
-        //the index of array needs to be changed into the array for x to for the spots 0 and 1.
-        if (visited[k*s]= true){
-            return true;
+    public static void toString(int[] array){
+        System.out.println(bestK);
+        for (int i=0; i<bestK;i++){
+            if (array[i]== 1){
+                System.out.println("port");
+            }
+            else{
+                System.out.println("starboard");
+            }
         }
-        return false;
+        System.out.println("");
     }
+
+    /*
+    * Method was supposed to be used for multiple iterations
+    * could not solve...
+    */
+
+    // public static void init2(int[] array) {
+    //         for(int i=1; i<iter;i++){
+    //             boatLength = array[3 + currX.length];
+    //             L = boatLength * 100;
+    //             cars = Arrays.copyOfRange(array,4+cars.length, array[-1]);
+    //             n = cars.length;
+
+    //             currX = new int[cars.length];
+    //             bestX = new int[cars.length];
+
+    //             visited = new boolean[(n+1)*(L+1)]; //initialize the visited array
+    //             backTrackSolve(0, L);
+    //             toString(currX);
+    //         }
+
+    // }
 
 }
